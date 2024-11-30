@@ -1,5 +1,5 @@
-import pandas as pd
 import random
+import pandas as pd
 
 
 def fetch_10_consecutive_random_data_points(file_path):
@@ -24,7 +24,7 @@ def fetch_10_consecutive_random_data_points(file_path):
             print(f"File {file_path} is empty.")
             return []
         start_idx = random.randint(0, max(0, len(df) - num_points))
-        return df.iloc[start_idx:start_idx + num_points].to_dict('records')
+        return df.iloc[start_idx:start_idx + num_points].values.tolist()
     except FileNotFoundError as e:
         print(f"File not found: {file_path}")
         raise e

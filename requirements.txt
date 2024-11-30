@@ -1,1 +1,2 @@
-pytest==7.4.0         # Testing framework
+pandas==1.5.3         
+pytest==7.4.0        

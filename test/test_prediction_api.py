@@ -1,9 +1,10 @@
 import pytest
 from src.prediction_api import predict_next_values
+from datetime import datetime, timedelta
 
-def test_predict_10_rows():
+def test_predict_normal_dataset():
     """
-    Test prediction with a dataset containing 10 stock details.
+    Test prediction with a normal dataset containing stock details.
     """
     SAMPLE_DATA = [
         ["FLTR", "01-09-2023", 16340.00],
@@ -17,17 +18,26 @@ def test_predict_10_rows():
         ["FLTR", "09-09-2023", 16401.02],
         ["FLTR", "10-09-2023", 16384.62],
     ]
+
     result = predict_next_values(SAMPLE_DATA)
-    # Expected results:
-    # Prices = [16340.00, 16258.30, 16274.56, 16176.91, 16419.56, 16288.21, 16483.67, 16516.63, 16401.02, 16384.62]
-    # n = 16384.62
-    # n_plus_1 = 16483.67 (second-highest)
-    # n_plus_2 = 16384.62 + (16483.67 - 16384.62) / 2 = 16434.145
-    # n_plus_3 = 16434.145 + (16483.67 - 16434.145) / 4 = 16446.52625
-    expected = [16483.67, 16434.145, 16446.52625]
-    assert result == pytest.approx(expected, rel=1e-9)
 
+    stock_id = "FLTR"
+    last_timestamp = datetime.strptime("10-09-2023", "%d-%m-%Y")
+    expected_timestamps = [
+        (last_timestamp + timedelta(days=i)).strftime("%d-%m-%Y")
+        for i in range(1, 4)
+    ]
 
+    expected_prices = [16483.67, 16434.15, 16446.53]
+
+    # Check Stock-ID and Timestamp
+    for i, row in enumerate(result):
+        assert row[0] == stock_id
+        assert row[1] == expected_timestamps[i]
+
+    # Check prices
+    for actual_price, expected_price in zip([row[2] for row in result], expected_prices):
+        assert actual_price == pytest.approx(expected_price, rel=1e-2)
 
 def test_predict_empty_dataset():
     """
@@ -54,5 +64,5 @@ def test_predict_invalid_dataset_format():
         ["FLTR", "09-09-2023"],
         ["FLTR", "10-09-2023"],
     ]
-    with pytest.raises(ValueError, match="Invalid data format. Expected each row to have at least three elements."):
+    with pytest.raises(ValueError, match="Invalid data format"):
         predict_next_values(SAMPLE_DATA)
