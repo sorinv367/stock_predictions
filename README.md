@@ -1,6 +1,9 @@
 **Stock Price Prediction Tool
 **
+
+
 Requirements:
+
 Python 3.8 or higher
 pip
 
